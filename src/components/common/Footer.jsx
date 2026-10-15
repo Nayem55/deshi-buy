@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import API from '../../api/axios';
 import toast from 'react-hot-toast';
+import { optimizedImageUrl } from '../../utils/imageUrl';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -53,7 +54,13 @@ export default function Footer() {
       <footer className="bg-charcoal text-[#CBBFB3] pt-14">
         <div className="max-w-[1320px] mx-auto px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12">
           <div>
-            {settings.companyName && <div className="font-serif text-xl text-white tracking-wider mb-4">{settings.companyName}</div>}
+            <Link to="/" className="mb-5 inline-flex items-center" aria-label="Deshi Buy home">
+              <img
+                src={optimizedImageUrl(settings.logo || '/deshi-buy-logo.png', { width: 320 })}
+                alt={settings.companyName || 'Deshi Buy'}
+                className="h-11 w-auto max-w-[210px] object-contain"
+              />
+            </Link>
             {settings.footerAbout && <p className="text-[13px] leading-relaxed mb-5 text-[#B7A99B]">{settings.footerAbout}</p>}
             <div className="flex gap-3.5">
               {[
