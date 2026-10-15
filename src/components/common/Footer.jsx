@@ -4,6 +4,24 @@ import API from '../../api/axios';
 import toast from 'react-hot-toast';
 import { optimizedImageUrl } from '../../utils/imageUrl';
 
+function SocialIcon({ name }) {
+  const common = { className: 'h-4 w-4', viewBox: '0 0 24 24', fill: 'currentColor', 'aria-hidden': true };
+
+  if (name === 'Facebook') {
+    return <svg {...common}><path d="M13.6 21v-7h2.35l.35-2.73H13.6V9.53c0-.79.22-1.33 1.36-1.33h1.45V5.76c-.25-.03-1.1-.11-2.09-.11-2.07 0-3.49 1.27-3.49 3.59v2.03H8.5V14h2.33v7h2.77Z" /></svg>;
+  }
+
+  if (name === 'Instagram') {
+    return <svg {...common} fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="4.25" /><circle cx="12" cy="12" r="4" /><circle cx="17.35" cy="6.7" r=".85" fill="currentColor" stroke="none" /></svg>;
+  }
+
+  if (name === 'TikTok') {
+    return <svg {...common}><path d="M16.76 5.03c.52 1.25 1.5 2.24 2.75 2.77v2.6a7.1 7.1 0 0 1-2.73-.74v5.42a5.35 5.35 0 1 1-5.35-5.35c.23 0 .46.02.68.05v2.63a2.74 2.74 0 1 0 1.92 2.61V3.5h2.73Z" /></svg>;
+  }
+
+  return <svg {...common} viewBox="0 0 24 24"><path d="M21.55 7.12a3.1 3.1 0 0 0-2.18-2.2C17.45 4.4 12 4.4 12 4.4s-5.45 0-7.37.52a3.1 3.1 0 0 0-2.18 2.2C1.93 9.05 1.93 12 1.93 12s0 2.95.52 4.88a3.1 3.1 0 0 0 2.18 2.2c1.92.52 7.37.52 7.37.52s5.45 0 7.37-.52a3.1 3.1 0 0 0 2.18-2.2c.52-1.93.52-4.88.52-4.88s0-2.95-.52-4.88ZM10.2 15.1V8.9l5.15 3.1-5.15 3.1Z" /></svg>;
+}
+
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [settings, setSettings] = useState({});
@@ -64,12 +82,12 @@ export default function Footer() {
             {settings.footerAbout && <p className="text-[13px] leading-relaxed mb-5 text-[#B7A99B]">{settings.footerAbout}</p>}
             <div className="flex gap-3.5">
               {[
-                { key: 'fb', label: 'Facebook', text: 'f' },
-                { key: 'ig', label: 'Instagram', text: 'ig' },
-                { key: 'tiktok', label: 'TikTok', text: 'tt' },
-                { key: 'yt', label: 'YouTube', text: 'yt' },
+                { key: 'fb', label: 'Facebook' },
+                { key: 'ig', label: 'Instagram' },
+                { key: 'tiktok', label: 'TikTok' },
+                { key: 'yt', label: 'YouTube' },
               ].filter((item) => settings.social?.[item.key]).map((item) => (
-                <a key={item.key} href={settings.social[item.key]} aria-label={item.label} target="_blank" rel="noreferrer" className="w-8 h-8 border border-[#4A4038] rounded-full flex items-center justify-center text-xs hover:border-gold hover:text-gold transition-colors">{item.text}</a>
+                <a key={item.key} href={settings.social[item.key]} aria-label={item.label} title={item.label} target="_blank" rel="noreferrer" className="w-9 h-9 border border-[#4A4038] rounded-full flex items-center justify-center text-[#E6DDD3] hover:border-gold hover:bg-gold hover:text-charcoal transition-colors"><SocialIcon name={item.label} /></a>
               ))}
             </div>
           </div>
