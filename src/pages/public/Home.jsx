@@ -26,10 +26,18 @@ const PRODUCT_SECTIONS = [
 
 const initialSectionState = () => Object.fromEntries(PRODUCT_SECTIONS.map(({ key }) => [key, { loading: true, error: null, data: [] }]));
 
+const SAMPLE_REVIEWS = [
+  { rating: 5, comment: 'প্যাকেজিং অনেক সুন্দর ছিল, আর পণ্যগুলোও একদম ফ্রেশ। গিফট দেওয়ার জন্য দারুণ একটি অপশন।', customerName: 'Customer • Dhaka' },
+  { rating: 5, comment: 'The gift box arrived neatly packed and on time. Everything looked premium and thoughtfully selected.', customerName: 'Customer • Chattogram' },
+  { rating: 5, comment: 'খেজুরের গুড়ের স্বাদ খুবই ভালো লেগেছে। পরিবারের সবাই পছন্দ করেছে।', customerName: 'Customer • Rajshahi' },
+  { rating: 5, comment: 'Fresh products, careful packing, and a very smooth ordering experience. Highly recommended.', customerName: 'Customer • Sylhet' },
+];
+
 export default function Home() {
   const [categories, setCategories] = useState({ loading: true, error: null, data: [] });
   const [sections, setSections] = useState(initialSectionState);
   const [reviews, setReviews] = useState([]);
+  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -51,6 +59,16 @@ export default function Home() {
     loadHome();
     return () => { active = false; };
   }, []);
+
+  const displayedReviews = reviews.length ? reviews : SAMPLE_REVIEWS;
+  useEffect(() => {
+    setActiveReviewIndex(0);
+  }, [reviews.length]);
+  useEffect(() => {
+    if (displayedReviews.length < 2) return undefined;
+    const timer = window.setInterval(() => setActiveReviewIndex((current) => (current + 1) % displayedReviews.length), 5500);
+    return () => window.clearInterval(timer);
+  }, [displayedReviews.length]);
 
   const renderProductSection = (section, index) => {
     const state = sections[section.key];
@@ -77,23 +95,23 @@ export default function Home() {
 
   const renderGiftBoxHighlight = () => {
     const giftBoxCategory = categories.data.find((category) => /deshi\s*buy\s*gift\s*box/i.test(category.name || '') || /gift-box/i.test(category.slug || ''));
-    const latestReview = reviews[0];
+    const activeReview = displayedReviews[activeReviewIndex] || displayedReviews[0];
     const categoryHref = giftBoxCategory ? `/shop?category=${encodeURIComponent(giftBoxCategory.slug || giftBoxCategory._id)}` : '/shop';
     return <section className="py-12 sm:py-16 bg-white">
       <div className="max-w-[1240px] mx-auto px-4 sm:px-7">
         <AnimateOnScroll animation="fade-up" className="mb-7 sm:mb-9"><span className="text-gold text-[11px] tracking-[0.24em] uppercase block mb-2">Made for gifting</span><h2 className="font-serif font-bold text-2xl sm:text-3xl text-charcoal">Deshi Buy Gift Box</h2></AnimateOnScroll>
         <div className="grid gap-5 md:grid-cols-2 md:gap-7">
-          <AnimateOnScroll animation="fade-up">
-            <Link to={categoryHref} className="group block min-h-[280px] sm:min-h-[340px] overflow-hidden rounded-2xl bg-[#f4f7e9] relative">
+          <AnimateOnScroll animation="fade-up" className="h-full">
+            <Link to={categoryHref} className="group block h-full min-h-[280px] sm:min-h-[340px] overflow-hidden rounded-2xl bg-[#f4f7e9] relative">
               {giftBoxCategory?.image ? <img src={optimizedImageUrl(giftBoxCategory.image, { width: 960 })} alt="Deshi Buy Gift Box" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <div className="absolute inset-0 bg-gradient-to-br from-gold/30 to-oxblood/30" />}
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/10 to-transparent" />
               <div className="absolute bottom-0 p-6 sm:p-8 text-white"><p className="text-xs tracking-[0.16em] uppercase text-gold mb-2">Thoughtfully Curated</p><h3 className="font-serif text-2xl sm:text-3xl font-bold">Gift Something Truly Deshi</h3><span className="inline-flex mt-4 text-xs font-bold tracking-[0.12em] uppercase border-b border-white pb-1">Explore Gift Boxes</span></div>
             </Link>
           </AnimateOnScroll>
-          <AnimateOnScroll animation="fade-up" delay={100}>
+          <AnimateOnScroll animation="fade-up" delay={100} className="h-full">
             <div className="h-full min-h-[280px] sm:min-h-[340px] rounded-2xl border border-line bg-[#fffdf5] p-6 sm:p-8 flex flex-col justify-between">
-              <div><span className="text-gold text-[11px] tracking-[0.24em] uppercase">Customer Review</span><div className="mt-5 text-gold tracking-[0.18em] text-lg">★★★★★</div>{latestReview ? <><blockquote className="mt-5 font-serif text-xl sm:text-2xl leading-relaxed text-charcoal">“{latestReview.comment || 'A wonderful Deshi Buy experience.'}”</blockquote><p className="mt-5 text-sm font-semibold text-charcoal">{latestReview.user?.name || latestReview.user?.email || 'Verified Customer'}</p></> : <><blockquote className="mt-5 font-serif text-xl sm:text-2xl leading-relaxed text-charcoal">“Beautifully packed authentic products, perfect for sharing with family and friends.”</blockquote><p className="mt-5 text-sm font-semibold text-charcoal">Deshi Buy Customer</p></>}</div>
-              <Link to="/shop?category=deshi-buy-gift-box" className="mt-8 text-oxblood-dark text-xs font-semibold tracking-[0.12em] uppercase border-b border-oxblood-dark pb-1 w-fit hover:text-gold hover:border-gold transition-colors">Shop Gift Boxes</Link>
+              <div key={activeReview?._id || activeReview?.customerName || activeReviewIndex} className="review-slide"><div className="flex items-center justify-between gap-3"><span className="text-gold text-sm sm:text-base font-bold tracking-[0.2em] uppercase">Customer Review</span>{displayedReviews.length > 1 && <span className="text-xs text-charcoal/45">{activeReviewIndex + 1} / {displayedReviews.length}</span>}</div><div className="mt-5 text-gold tracking-[0.18em] text-lg">{'★'.repeat(Math.max(1, Math.min(5, activeReview?.rating || 5)))}</div><blockquote className="mt-5 font-serif text-xl sm:text-2xl leading-relaxed text-charcoal">“{activeReview?.comment || 'A wonderful Deshi Buy experience.'}”</blockquote><p className="mt-5 text-sm font-semibold text-charcoal">{activeReview?.customerName || activeReview?.user?.name || activeReview?.user?.email || 'Verified Customer'}</p></div>
+              <div className="mt-8 flex items-end justify-between gap-4"><Link to="/shop?category=deshi-buy-gift-box" className="text-oxblood-dark text-xs font-semibold tracking-[0.12em] uppercase border-b border-oxblood-dark pb-1 w-fit hover:text-gold hover:border-gold transition-colors">Shop Gift Boxes</Link>{displayedReviews.length > 1 && <div className="flex gap-1.5">{displayedReviews.map((review, index) => <button key={review._id || review.customerName || index} type="button" onClick={() => setActiveReviewIndex(index)} aria-label={`Show review ${index + 1}`} className={`h-2 w-2 rounded-full transition-colors ${index === activeReviewIndex ? 'bg-oxblood' : 'bg-charcoal/20 hover:bg-charcoal/40'}`} />)}</div>}</div>
             </div>
           </AnimateOnScroll>
         </div>
