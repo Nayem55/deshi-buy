@@ -31,13 +31,14 @@ export default function ProductCard({ product }) {
   }).filter((p) => p !== Infinity);
   const minVariationPrice = variationPrices.length > 0 ? Math.min(...variationPrices) : 0;
   const maxVariationPrice = variationPrices.length > 0 ? Math.max(...variationPrices) : 0;
+  const hasVariationSale = weightVariations.some((variation) => Boolean(variation.isOnSale && variation.salePrice && Number(variation.salePrice) < Number(variation.price)));
 
   // Determine display price
   let displayPrice, regularPrice, isOnSale;
   if (hasVariations && variationPrices.length > 1) {
     displayPrice = minVariationPrice;
     regularPrice = maxVariationPrice;
-    isOnSale = false;
+    isOnSale = hasVariationSale;
   } else if (hasVariations && variationPrices.length === 1) {
     displayPrice = variationPrices[0];
     regularPrice = variationPrices[0];
@@ -90,6 +91,7 @@ export default function ProductCard({ product }) {
   const tags = [];
   if (product.isNew) tags.push({ label: 'New', className: 'bg-oxblood' });
   if (product.isBestSeller) tags.push({ label: 'Best Seller', className: 'bg-gold' });
+  if (product.isSeasonal) tags.push({ label: 'Seasonal', className: 'bg-emerald-700' });
   if (isOnSale) tags.push({ label: 'Sale', className: 'bg-oxblood' });
   if (product.isBridal && tags.length === 0) tags.push({ label: 'Bridal', className: 'bg-oxblood-dark' });
   const tagTopOffsets = ['top-3', 'top-9', 'top-[4.5rem]'];
@@ -147,7 +149,7 @@ export default function ProductCard({ product }) {
       </Link>
       <button
         onClick={handleOrderNow}
-        className="mt-3 w-full rounded-lg bg-oxblood py-2.5 text-xs font-semibold tracking-[0.1em] uppercase text-ivory transition-colors hover:bg-oxblood-dark"
+        className="mt-3 w-full rounded-lg bg-oxblood py-2.5 text-xs font-semibold tracking-[0.1em] uppercase text-ivory transition-colors hover:bg-red-600"
       >
         Order Now
       </button>

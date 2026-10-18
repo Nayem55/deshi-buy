@@ -39,7 +39,7 @@ export default function ProductDetail() {
         setQuantity(1);
 
         const variations = productData.weightVariations || productData.stitchVariations || [];
-        setSelectedWeight(variations.length === 1 ? variations[0].type : '');
+        setSelectedWeight(variations[0]?.type || '');
 
         if (productData.category?._id || productData.category) {
           const catId = typeof productData.category === 'object' ? productData.category._id : productData.category;
@@ -533,7 +533,7 @@ export default function ProductDetail() {
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="h-[52px] lg:h-11 bg-oxblood text-ivory rounded-lg font-semibold text-base lg:text-sm hover:bg-oxblood-dark active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  className="h-[52px] lg:h-11 bg-oxblood text-ivory rounded-lg font-semibold text-base lg:text-sm hover:bg-red-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                   Order Now
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -21,6 +21,7 @@ const ProductForm = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
   const [isDirty, setIsDirty] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -47,9 +48,17 @@ const ProductForm = () => {
     isBestSeller: false,
     isNew: false,
     isBridal: false,
+    isSeasonal: false,
     images: [],
     weightVariations: [],
   });
+
+  const variationQuantities = [0.25, 0.5, 1, 2, 3, 5, 10];
+  const variationUnits = ['kg', 'gm', 'litre', 'ml'];
+  const displayVariationType = (variation) => {
+    const quantity = Number(variation.quantity);
+    return quantity > 0 && variation.unit ? `${quantity} ${variation.unit}` : variation.type || '';
+  };
 
   const getId = (value) => (typeof value === 'object' ? value?._id || value?.id || '' : value || '');
 
@@ -171,8 +180,16 @@ const ProductForm = () => {
         isBestSeller: product.isBestSeller || false,
         isNew: product.isNew || false,
         isBridal: product.isBridal || false,
+        isSeasonal: product.isSeasonal || false,
         images: product.images || [],
-        weightVariations: product.weightVariations || product.stitchVariations || [],
+        weightVariations: (product.weightVariations || product.stitchVariations || []).map((variation) => {
+          const match = String(variation.type || '').match(/^(\d+(?:\.\d+)?)\s*(kg|gm|litre|ml)$/i);
+          return {
+            ...variation,
+            quantity: variation.quantity ?? (match ? match[1] : ''),
+            unit: variation.unit ?? (match ? match[2].toLowerCase() : 'kg'),
+          };
+        }),
       });
     } catch (err) {
       console.error('Failed to fetch product:', err);
@@ -259,7 +276,7 @@ const ProductForm = () => {
   const handleAddWeightVariation = () => {
     setFormData((prev) => ({
       ...prev,
-      weightVariations: [...prev.weightVariations, { type: '1 kg', price: '', salePrice: '', isOnSale: false }],
+      weightVariations: [...prev.weightVariations, { type: '1 kg', quantity: 1, unit: 'kg', price: '', salePrice: '', isOnSale: false }],
     }));
     markDirty();
   };
@@ -277,7 +294,9 @@ const ProductForm = () => {
       ...prev,
       weightVariations: prev.weightVariations.map((v, i) => {
         if (i !== index) return v;
-        return { ...v, [field]: value };
+        const next = { ...v, [field]: value };
+        if (field === 'quantity' || field === 'unit') next.type = displayVariationType(next);
+        return next;
       }),
     }));
     markDirty();
@@ -327,6 +346,16 @@ const ProductForm = () => {
     markDirty();
   };
 
+  const handleAddImageUrl = () => {
+    const imageUrl = imageUrlInput.trim();
+    if (!/^https?:\/\//i.test(imageUrl)) { toast.error('Enter a valid image URL starting with http:// or https://'); return; }
+    if (formData.images.length >= 6) { toast.error('Maximum 6 images allowed'); return; }
+    if (formData.images.includes(imageUrl)) { toast.error('This image link has already been added'); return; }
+    setFormData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }));
+    setImageUrlInput('');
+    markDirty();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -351,6 +380,12 @@ const ProductForm = () => {
           .split(',')
           .map((t) => t.trim())
           .filter(Boolean),
+        weightVariations: formData.weightVariations.map((variation) => ({
+          ...variation,
+          quantity: Number(variation.quantity),
+          unit: variation.unit,
+          type: displayVariationType(variation),
+        })),
       };
       delete payload.categoryRows;
 
@@ -736,12 +771,12 @@ const ProductForm = () => {
           </div>
         </div>
 
-        {/* Weight Variations */}
+        {/* Weight / Volume Variations */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Weight Variations</h2>
-              <p className="text-sm text-gray-500 mt-1">Set a separate price for each available weight.</p>
+              <h2 className="text-lg font-semibold text-gray-900">Weight & Volume Variations</h2>
+              <p className="text-sm text-gray-500 mt-1">Choose an amount and unit separately, then set its price.</p>
             </div>
             <button
               type="button"
@@ -751,7 +786,7 @@ const ProductForm = () => {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Weight
+              Add variation
             </button>
           </div>
 
@@ -760,26 +795,31 @@ const ProductForm = () => {
               <svg className="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              <p className="text-sm text-gray-500 mb-1">No weight variations added</p>
-              <p className="text-xs text-gray-400">Click “Add Weight” to create 1 kg, 2 kg, 3 kg, 5 kg or 10 kg options with separate prices.</p>
+              <p className="text-sm text-gray-500 mb-1">No variations added</p>
+              <p className="text-xs text-gray-400">Create standard or custom kg, gm, litre, or ml options with separate prices.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {formData.weightVariations.map((variation, index) => (
                 <div key={index} className="flex flex-col sm:flex-row gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Weight</label>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Amount</label>
                     <select
-                      value={variation.type}
-                      onChange={(e) => handleWeightVariationChange(index, 'type', e.target.value)}
+                      value={variationQuantities.includes(Number(variation.quantity)) ? Number(variation.quantity) : 'custom'}
+                      onChange={(e) => handleWeightVariationChange(index, 'quantity', e.target.value === 'custom' ? '' : e.target.value)}
                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
                     >
-                      <option value="">Select weight</option>
-                      <option value="1 kg">1 kg</option>
-                      <option value="2 kg">2 kg</option>
-                      <option value="3 kg">3 kg</option>
-                      <option value="5 kg">5 kg</option>
-                      <option value="10 kg">10 kg</option>
+                      {variationQuantities.map((quantity) => <option key={quantity} value={quantity}>{quantity}</option>)}
+                      <option value="custom">Custom amount</option>
+                    </select>
+                    {!variationQuantities.includes(Number(variation.quantity)) && (
+                      <input type="number" value={variation.quantity} onChange={(e) => handleWeightVariationChange(index, 'quantity', e.target.value)} placeholder="Custom amount" min="0.001" step="any" className="w-full mt-2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Unit</label>
+                    <select value={variation.unit || 'kg'} onChange={(e) => handleWeightVariationChange(index, 'unit', e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white">
+                      {variationUnits.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
                     </select>
                   </div>
                   <div className="flex-1">
@@ -861,6 +901,7 @@ const ProductForm = () => {
               { name: 'isTrending', label: 'Trending Now', desc: 'Show in homepage Trending Now section' },
               { name: 'isBestSeller', label: 'Best Seller', desc: 'Mark as best selling product' },
               { name: 'isNew', label: 'New Arrival', desc: 'Show as new product' },
+              { name: 'isSeasonal', label: 'Seasonal Product', desc: 'Show in seasonal products' },
               { name: 'isBridal', label: 'Bridal Collection', desc: 'Part of bridal collection' },
             ].map((toggle) => (
               <label
@@ -900,7 +941,12 @@ const ProductForm = () => {
         {/* Images */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Images</h2>
-          <p className="text-sm text-gray-500 mb-4">Upload up to 6 images. First image will be the main image.</p>
+          <p className="text-sm text-gray-500 mb-4">Upload or add up to 6 image links. The first image will be the main image.</p>
+
+          <div className="flex flex-col sm:flex-row gap-2 mb-4">
+            <input value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddImageUrl(); } }} placeholder="https://example.com/product-image.jpg" className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500" />
+            <button type="button" onClick={handleAddImageUrl} className="px-4 py-2 text-sm font-semibold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100">Add image link</button>
+          </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {formData.images.map((imageUrl, index) => (

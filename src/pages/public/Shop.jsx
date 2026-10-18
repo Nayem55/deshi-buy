@@ -69,6 +69,8 @@ export default function Shop() {
   const isFeatured = searchParams.get("isFeatured") || "";
   const isNew = searchParams.get("isNew") || "";
   const isBridal = searchParams.get("isBridal") || "";
+  const isOnSale = searchParams.get("isOnSale") || "";
+  const isSeasonal = searchParams.get("isSeasonal") || "";
 
   // Fetch filter data
   useEffect(() => {
@@ -124,6 +126,8 @@ export default function Shop() {
         if (isFeatured) params.set("isFeatured", isFeatured);
         if (isNew) params.set("isNew", isNew);
         if (isBridal) params.set("isBridal", isBridal);
+        if (isOnSale) params.set("isOnSale", isOnSale);
+        if (isSeasonal) params.set("isSeasonal", isSeasonal);
 
         const { data } = await API.get(`/products?${params.toString()}`);
         setProducts(data.data || data.products || []);
@@ -228,7 +232,9 @@ export default function Shop() {
     isBestSeller ||
     isFeatured ||
     isNew ||
-    isBridal;
+    isBridal ||
+    isOnSale ||
+    isSeasonal;
   const seoTitle = subcategoryParam
     ? `${currentSubcategory?.name || "Subcategory"} Collection`
     : categoryParam
@@ -244,6 +250,10 @@ export default function Shop() {
             ? "Best Selling Outfits"
             : isNew
               ? "New Arrival Outfits"
+            : isOnSale
+              ? "Discount Products"
+              : isSeasonal
+                ? "Seasonal Products"
               : isBridal
                 ? "Bridal and Formal Wear"
                 : "Shop Premium Outfits";
@@ -543,6 +553,10 @@ export default function Shop() {
                         ? "Featured Products"
                         : isNew
                           ? "New Arrivals"
+                          : isOnSale
+                            ? "Discount Products"
+                            : isSeasonal
+                              ? "Seasonal Products"
                           : isBridal
                             ? "Bridal Collection"
                             : "All Products"}
