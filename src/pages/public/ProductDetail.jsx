@@ -468,8 +468,8 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="mt-8 lg:mt-5 flex flex-col gap-3 lg:flex-row lg:items-center">
-              <div className="flex items-center gap-3 lg:flex-shrink-0">
+            <div className="mt-8 lg:mt-5 space-y-3">
+              <div className="flex items-center gap-3">
                 <div className="flex items-center border border-charcoal/20 rounded-lg overflow-hidden h-[52px] lg:h-11">
                   <button
                     onClick={() => handleQuantityChange(-1)}
@@ -521,7 +521,7 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              <div className="grid w-full gap-3 sm:grid-cols-2 lg:flex-1">
+              <div className="grid w-full gap-3 sm:grid-cols-3">
                 <button
                   onClick={handleAddToCart}
                   className="h-[52px] lg:h-11 border border-oxblood text-oxblood rounded-lg font-semibold text-base lg:text-sm hover:bg-oxblood/5 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
@@ -529,17 +529,25 @@ export default function ProductDetail() {
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
                   </svg>
-                  Add to Cart
+                  কার্ট এ যোগ করুন
                 </button>
                 <button
                   onClick={handleBuyNow}
                   className="h-[52px] lg:h-11 bg-oxblood text-ivory rounded-lg font-semibold text-base lg:text-sm hover:bg-red-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
-                  Order Now
+                  অর্ডার করুন
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </button>
+                <a
+                  href="https://wa.me/8801827772779"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="h-[52px] lg:h-11 bg-[#25D366] text-white rounded-lg font-semibold text-base lg:text-sm hover:bg-[#1da851] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  হোয়াটসঅ্যাপ এ কল করুন
+                </a>
               </div>
             </div>
 

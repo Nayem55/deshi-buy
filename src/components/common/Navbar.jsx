@@ -293,11 +293,15 @@ export default function Navbar() {
   return (
     <>
       {announcementText && (
-        <div className="bg-charcoal text-blush text-center text-[11px] tracking-[0.14em] uppercase py-2.5 overflow-hidden whitespace-nowrap">
-          <div className="animate-[marquee_20s_linear_infinite] inline-block">
+        <div className="bg-charcoal text-blush text-center text-sm sm:text-base tracking-[0.08em] uppercase py-3">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 px-4">
             {announcementText.split('|').map((text, i) => (
-              <span key={i} className="px-6">{text.trim()}</span>
+              <span key={i}>{text.trim()}</span>
             ))}
+            <a href="tel:01827772779" className="inline-flex items-center gap-2 font-semibold hover:text-gold transition-colors" aria-label="Call 01827772779">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.25 4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423a1.125 1.125 0 0 1-.417 1.14l-1.293.97a.75.75 0 0 0-.209.908 12.035 12.035 0 0 0 7.316 7.316.75.75 0 0 0 .908-.209l.97-1.293a1.125 1.125 0 0 1 1.14-.417l4.423 1.106c.501.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-1.5C9.44 21.75 2.25 14.56 2.25 5.5V4.5Z" /></svg>
+              01827772779
+            </a>
           </div>
         </div>
       )}
@@ -373,6 +377,9 @@ export default function Navbar() {
         </div>
         <nav className="border-t border-line hidden lg:block">
           <ul className="flex justify-center gap-8 xl:gap-10 max-w-[1320px] mx-auto py-3.5 flex-wrap">
+            <li>
+              <Link to="/" className={`text-xs tracking-[0.13em] uppercase font-medium pb-1 transition-all ${pathname === '/' ? 'text-oxblood-dark font-bold border-b-2 border-gold' : 'text-charcoal border-b border-transparent hover:border-gold hover:text-oxblood-dark'}`}>Home</Link>
+            </li>
             {storefrontAvailable && (
               <li>
                 <Link to="/shop" className={`text-xs tracking-[0.13em] uppercase font-medium pb-1 transition-all ${pathname === '/shop' ? 'text-oxblood-dark font-bold border-b-2 border-gold' : 'text-charcoal border-b border-transparent hover:border-gold hover:text-oxblood-dark'}`}>Shop</Link>
@@ -415,6 +422,10 @@ export default function Navbar() {
                 Search products...
               </button>
               <div className="space-y-0.5">
+                <Link to="/" onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${pathname === '/' ? 'bg-gold/10 text-oxblood-dark font-bold' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal'}`}>
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5v-9Z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 21v-6h6v6" /></svg>
+                  Home
+                </Link>
                 {storefrontAvailable && (
                   <Link to="/shop" onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${pathname === '/shop' ? 'bg-gold/10 text-oxblood-dark font-bold' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal'}`}>
                     <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
