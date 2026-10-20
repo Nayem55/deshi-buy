@@ -22,6 +22,13 @@ function SocialIcon({ name }) {
   return <svg {...common} viewBox="0 0 24 24"><path d="M21.55 7.12a3.1 3.1 0 0 0-2.18-2.2C17.45 4.4 12 4.4 12 4.4s-5.45 0-7.37.52a3.1 3.1 0 0 0-2.18 2.2C1.93 9.05 1.93 12 1.93 12s0 2.95.52 4.88a3.1 3.1 0 0 0 2.18 2.2c1.92.52 7.37.52 7.37.52s5.45 0 7.37-.52a3.1 3.1 0 0 0 2.18-2.2c.52-1.93.52-4.88.52-4.88s0-2.95-.52-4.88ZM10.2 15.1V8.9l5.15 3.1-5.15 3.1Z" /></svg>;
 }
 
+function ContactIcon({ type }) {
+  const common = { className: 'mt-0.5 h-4 w-4 shrink-0 text-gold', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', 'aria-hidden': true };
+  if (type === 'phone') return <svg {...common}><path strokeLinecap="round" strokeLinejoin="round" d="M4.8 3.8 7.6 3l1.7 4.3-2.1 1.6a14.1 14.1 0 0 0 7.9 7.9l1.6-2.1L21 16.4l-.8 2.8a2.4 2.4 0 0 1-2.7 1.7C9.9 19.7 4.3 14.1 3.1 6.5A2.4 2.4 0 0 1 4.8 3.8Z" /></svg>;
+  if (type === 'email') return <svg {...common}><rect x="3" y="5" width="18" height="14" rx="2" /><path strokeLinecap="round" strokeLinejoin="round" d="m4 7 8 6 8-6" /></svg>;
+  return <svg {...common}><path strokeLinecap="round" strokeLinejoin="round" d="M20 10c0 5.3-8 10.2-8 10.2S4 15.3 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.7" /></svg>;
+}
+
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [settings, setSettings] = useState({});
@@ -59,6 +66,13 @@ export default function Footer() {
 
   if (!storefrontAvailable) return null;
 
+  const socialLinks = {
+    ...settings.social,
+    yt: settings.social?.yt || 'https://www.youtube.com/@DeshiBuy',
+  };
+  const footerEmails = [settings.contact?.email, 'support24@deshibuy.com'].filter(Boolean);
+  const footerPhones = [settings.contact?.phone, '+8801844688591'].filter(Boolean);
+
   return (
     <>
       <section className="bg-blush text-center py-16 px-4">
@@ -86,8 +100,8 @@ export default function Footer() {
                 { key: 'ig', label: 'Instagram' },
                 { key: 'tiktok', label: 'TikTok' },
                 { key: 'yt', label: 'YouTube' },
-              ].filter((item) => settings.social?.[item.key]).map((item) => (
-                <a key={item.key} href={settings.social[item.key]} aria-label={item.label} title={item.label} target="_blank" rel="noreferrer" className="w-9 h-9 border border-[#4A4038] rounded-full flex items-center justify-center text-[#E6DDD3] hover:border-gold hover:bg-gold hover:text-charcoal transition-colors"><SocialIcon name={item.label} /></a>
+              ].filter((item) => socialLinks[item.key]).map((item) => (
+                <a key={item.key} href={socialLinks[item.key]} aria-label={item.label} title={item.label} target="_blank" rel="noreferrer" className="w-9 h-9 border border-[#4A4038] rounded-full flex items-center justify-center text-[#E6DDD3] hover:border-gold hover:bg-gold hover:text-charcoal transition-colors"><SocialIcon name={item.label} /></a>
               ))}
             </div>
           </div>
@@ -116,10 +130,9 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-xs tracking-[0.14em] uppercase mb-5 font-semibold">Get In Touch</h4>
             <ul className="space-y-2.5 text-[13px]">
-              {settings.contact?.email && <li>{settings.contact.email}</li>}
-              {settings.contact?.phone && <li>{settings.contact.phone}</li>}
-              {settings.contact?.address && <li>{settings.contact.address}</li>}
-              {settings.contact?.hours && <li>{settings.contact.hours}</li>}
+              {footerEmails.map((email) => <li key={email} className="flex items-start gap-2"><ContactIcon type="email" /><a href={`mailto:${email}`} className="hover:text-white transition-colors">{email}</a></li>)}
+              {footerPhones.map((phone) => <li key={phone} className="flex items-start gap-2"><ContactIcon type="phone" /><span>{phone}</span></li>)}
+              {settings.contact?.address && <li className="flex items-start gap-2"><ContactIcon type="address" /><span>{settings.contact.address}</span></li>}
             </ul>
           </div>
         </div>
